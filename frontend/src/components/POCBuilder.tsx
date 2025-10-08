@@ -53,14 +53,6 @@ const POCBuilder: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Load documents and POCs
-  useEffect(() => {
-    if (token) {
-      loadDocuments();
-      loadPOCs();
-    }
-  }, [token]);
-
   const loadDocuments = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/poc/documents', {
@@ -82,6 +74,14 @@ const POCBuilder: React.FC = () => {
       console.error('Failed to load POCs:', error);
     }
   };
+
+  // Load documents and POCs
+  useEffect(() => {
+    if (token) {
+      loadDocuments();
+      loadPOCs();
+    }
+  }, [token, loadDocuments, loadPOCs]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
