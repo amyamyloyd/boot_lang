@@ -1,6 +1,12 @@
 # Database
 # Note: boot_lang.db is intentionally tracked for bootstrap deployment
 
+# POC Agent files
+vector_stores/
+pocs/
+test_requirements.txt
+test_design_notes.md
+
 # Python
 __pycache__/
 *.py[cod]

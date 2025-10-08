@@ -14,6 +14,7 @@ from database import init_db
 from auth import router as auth_router
 from user_management import router as user_router
 from admin import router as admin_router
+from poc_api import router as poc_router
 
 load_dotenv()
 
@@ -44,6 +45,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(admin_router)
+app.include_router(poc_router)
 
 # Pydantic models
 class LoginRequest(BaseModel):
