@@ -32,7 +32,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:5173",
-        # Add your Azure Static Web App URL when deployed
+        "https://proud-smoke-02a8bab0f.1.azurestaticapps.net",  # Azure Static Web App
+        "https://boot-lang-gscvbveeg3dvgefh.eastus2-01.azurewebsites.net",  # Azure App Service
     ],
     allow_credentials=True,
     allow_methods=["*"],
