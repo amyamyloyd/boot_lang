@@ -1,0 +1,162 @@
+---
+alwaysApply: false
+---
+fileType: markdown
+name: documentation.mdc
+description: Ensures every function, endpoint, component, agent, or service is professionally documented with Markdown and Mermaid diagrams inside the /architecture folder.
+---
+You are an expert in software documentation, technical writing, and system communication. You create high-quality, readable, reusable documentation that helps engineers, agents, and collaborators understand how a system works — and how to safely build on it.
+
+## 🧭 Documentation Scope and Output
+
+Whenever new functionality is added or updated (code, endpoints, agents, services, tools, tests, or components), generate or update Markdown files inside the `/architecture/` folder.
+
+Each documentation file must include:
+- Clear purpose and usage description
+- Signature/shape (params, returns, props, etc.)
+- Input/output behavior
+- Diagrams for flows and integrations
+- Examples of use
+- Cross-links to related files or agents
+
+---
+
+## 📁 Target Files and Their Purpose
+
+| File Name           | Content                                                             |
+|---------------------|----------------------------------------------------------------------|
+| `functions.md`      | All standalone functions and utilities                              |
+| `endpoints.md`      | All FastAPI/HTTP endpoints with method, path, and behavior          |
+| `agents.md`         | Autogen agents, chains, tools, and LangGraph node behavior          |
+| `components.md`     | React components and prop shape                                     |
+| `tokens.md`         | Tailwind color/font/spacing tokens                                  |
+| `flows.md`          | System flows, pipelines, async workflows                            |
+| `architecture.md`   | High-level system overview with Mermaid diagrams                    |
+
+All files must be in Markdown (`.md`) and compatible with agents and editors.
+
+---
+
+## 🧱 Markdown Format Standards
+
+Each section of documentation must follow this structure:
+
+```md
+## [Entity Name] — [Short Description]
+
+**Location:** `/path/to/file.ts`
+
+**Type:** [Function / Endpoint / Agent / Component / Tool]
+
+**Signature:**
+```ts
+function processExcelFile(filePath: string): Metadata
+````
+
+**Parameters:**
+
+* `filePath` (string): Path to local file
+* `options` (optional): Metadata config
+
+**Returns:**
+
+* Structured metadata object with sheet, field, and type info
+
+**Behavior:**
+
+* Validates Excel input
+* Loads file using pandas
+* Extracts and formats metadata
+* Logs and raises on error
+
+**Example:**
+
+```ts
+const meta = await processExcelFile("data/inventory.xlsx")
+```
+
+**Diagram:**
+
+```mermaid
+graph TD
+  A[User Upload] --> B[API Receives Excel]
+  B --> C[Pandas Extract Metadata]
+  C --> D[Metadata returned to agent]
+```
+
+**Linked Agents:** `upload_agent`, `postprocess_agent`
+
+````
+
+---
+
+## 🔁 Auto-Documentation Triggers
+
+Update or create documentation automatically when any of the following occurs:
+
+- Function is created or modified
+- New API endpoint is exposed
+- New Autogen agent, LangGraph node, or tool is defined
+- React component is added with exposed props
+- Tailwind token or theme value changes
+- New workflow or multi-step flow is implemented
+
+---
+
+## 🔗 Cross-Linking and Discoverability
+
+All documentation must include:
+- Links to related `.md` files (e.g. `See: agents.md > upload_agent`)
+- Usage context or feature reference (`Used in: Upload flow`)
+- Mention of owning component/module (`Owned by: upload.tsx`)
+
+This enables agents and engineers to quickly jump between function, endpoint, and architectural context.
+
+---
+
+## 📊 Mermaid Diagram Standards
+
+Every multi-step behavior must be visualized with a Mermaid diagram in the relevant `.md` file.
+
+Use these types:
+
+| Flow Type     | Mermaid Syntax Example |
+|---------------|------------------------|
+| System flow   | `graph TD`             |
+| Agent plan    | `sequenceDiagram`      |
+| State machine | `stateDiagram-v2`      |
+| Decision tree | `flowchart TD`         |
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Frontend
+  participant API
+  participant SQLite
+
+  User->>Frontend: Upload file
+  Frontend->>API: POST /process
+  API->>SQLite: Store metadata
+  API-->>Frontend: Response
+````
+
+---
+
+## ✅ Output Checklist
+
+* [x] Markdown saved to `/architecture/`
+* [x] Diagram present if flow-based
+* [x] Signature or prop shape included
+* [x] Cross-references and usage context noted
+* [x] Written for both humans and AI agents
+
+---
+
+This rule enforces professional-grade technical documentation that supports deep understanding, safe extension, and automated agent reasoning across your codebase.
+
+```
+
+---
+
+Let me know if you want to start the baseline `/architecture/*.md` docs next (like `functions.md`, `agents.md`, etc.) — or move to the next `.mdc` file like `imp.mdc` or `testing.mdc`.
+```

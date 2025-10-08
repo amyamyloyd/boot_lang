@@ -1,0 +1,106 @@
+---
+description: when you are asked to commit code or push to github
+alwaysApply: false
+---
+fileType: git
+name: git.mdc
+description: Enforces standardized commit message formatting, PRD/IMP traceability, and git hygiene across development phases.
+
+git repo for this project is https://github.com/amyamyloyd/boot_lang.git
+---
+You are an expert in Git version control, commit hygiene, and semantic change tracking. Your job is to enforce clear, structured, traceable commit messages that map directly to project intent (via PRDs and IMPs), and to block ambiguous or unstructured commit logs.
+
+## always confirm documentation following /.cursor/documentation.mdc is complete oprior to committing code
+
+## 📝 Commit Message Format
+
+All commit messages must follow this structure:
+
+```
+
+<type>: <short summary>
+
+* Bullet list of key changes
+* Each line describes a meaningful unit of work
+* Include references to PRD or IMP documents
+* Optionally note the related implementation phase
+
+````
+
+### ✅ Allowed Types (Prefixes)
+- `feat:` — New features or functionality
+- `fix:` — Bug fixes or patches
+- `docs:` — Documentation changes (including architecture or API docs)
+- `refactor:` — Internal restructuring without behavior change
+- `style:` — Code formatting, lint fixes, no logic changes
+- `test:` — Adding or updating unit/integration tests
+- `chore:` — Maintenance tasks, config, tooling, non-prod changes
+
+### ✅ Examples
+
+```bash
+feat: add customer rules validation system
+
+- Create .mdc file structure in .cursor directory
+- Add environment configuration with API keys
+- Set up virtual environment for Python 3.11.6
+- ref: prd/menu.md, imp/menu_imp.md (phase: Setup)
+
+fix: resolve API key loading issue
+
+- Update environment variable handling
+- Add proper error handling for missing keys
+- ref: imp/menu_imp.md (phase: API Bootstrapping)
+
+refactor: reorganize .mdc file structure
+
+- Move validation rules to dedicated subdirectory
+- Consolidate template files
+- Update documentation references
+- ref: imp/documentation.md (phase: Org Structure)
+````
+
+---
+
+## 🔗 PRD & IMP Traceability
+
+Each commit should include references to the project documents it fulfills:
+
+* **ref: `prd/<filename>.md`** — PRD being implemented
+* **ref: `imp/<filename>.md`** — Implementation plan driving changes
+* **phase: <IMP phase name>** — Optional but encouraged for granular history
+
+This allows traceability across product → implementation → code → deployment.
+
+---
+
+## 🚫 What to Avoid
+
+* ❌ One-line commits with no context
+* ❌ Unscoped messages like "update code", "fix stuff", "misc cleanup"
+* ❌ Commits without clear type or ref
+* ❌ Git auto-generated messages (e.g., "Merge branch...") unless merge is intentional
+
+---
+
+## 🧪 Preview Behavior in Cursor
+
+When user says:
+
+> "Commit this code"
+> Cursor should:
+
+* Prompt for a commit message in the above format
+* Suggest a prefix (`feat:`, `fix:`, etc.) based on diff
+* Extract PRD/IMP file references from current working context
+* Ask user for confirmation if phase tagging is ambiguous
+
+
+---
+
+## 🛠 Future Enhancements (Placeholder)
+
+* Branch naming conventions (`feature/*`, `bugfix/*`, etc.)
+* Pull request message templates
+* Release tagging and changelog automation
+```

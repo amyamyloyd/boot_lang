@@ -1,0 +1,132 @@
+---
+alwaysApply: false
+---
+fileType: javascript, typescript
+name: react.mdc
+description: Enforces strict React 18 component standards using functional components, hooks, and Tailwind CSS.
+---
+You are an expert in modern frontend development using React 18, functional components, React Hooks, and Tailwind CSS. You write accessible, reusable, performant components that follow strict UI design conventions and component structure standards.
+
+## ⚛️ React Component Standards
+
+### DO not overwrite or delete existing files unless the user is explicitly asking for a change to the existing page.
+
+### 📁 File Organization and Structure
+
+- All React components must be:
+  - Functional components (no class components)
+  - Located under `/components/` or `/features/` directories
+  - One component per file, named with PascalCase (e.g. `UploadWidget.tsx`)
+  - Grouped by domain or feature (not by type)
+
+- Example component file structure:
+```tsx
+// UploadWidget.tsx
+
+import React, { useState, useEffect } from "react"
+import { ArrowUpTrayIcon } from "@heroicons/react/24/solid"
+
+interface UploadWidgetProps {
+  onUpload: (file: File) => void
+}
+
+export default function UploadWidget({ onUpload }: UploadWidgetProps) {
+  const [file, setFile] = useState<File | null>(null)
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = e.target.files?.[0]
+    if (selected) {
+      setFile(selected)
+      onUpload(selected)
+    }
+  }
+
+  return (
+    <label className="flex items-center gap-2 p-2 border border-dashed rounded-md cursor-pointer hover:bg-gray-50">
+      <ArrowUpTrayIcon className="w-5 h-5 text-blue-500" />
+      <span>Upload File</span>
+      <input type="file" className="hidden" onChange={handleChange} />
+    </label>
+  )
+}
+````
+
+---
+
+### 🧠 Logic Rules
+
+* Use `useState`, `useEffect`, `useMemo`, and `useCallback` where appropriate — avoid unnecessary re-renders
+* Do not use `useEffect` as a catch-all — split logic into multiple hooks if needed
+* Prefer derived state over duplicating props in state
+* Do not use Redux unless specified — prefer local state or `useContext`
+
+---
+
+### 💬 Commenting and Documentation
+
+* Maintain 30% comment coverage in every component file
+* Every exported component must include a JSDoc comment:
+
+```tsx
+/**
+ * UploadWidget — renders a file uploader with icon.
+ *
+ * Props:
+ * - onUpload: callback triggered after file selection
+ *
+ * Returns:
+ * - JSX.Element
+ */
+```
+
+* Complex hooks or derived state logic must be commented inline
+
+---
+
+### 🧪 Testing
+
+* All components must have unit tests using React Testing Library
+* Snapshot tests should be used for pure visual components
+* DOM interaction tests (e.g. click, type, submit) should verify effects or outputs
+* Mocks should be used for API calls or async functions
+* Use `@testing-library/react`, `jest`, and `msw` (mock service worker) for endpoint mocking
+
+---
+
+### 🎨 Tailwind Integration
+
+* All styling must use Tailwind classes — no inline `style={{}}` unless dynamic tokens
+* Use utility-first classes to enforce consistent spacing, padding, borders, typography
+* Use variant classes for interaction states (`hover:`, `focus:`, `disabled:`)
+* Avoid Tailwind class duplication; extract to shared component if repeated
+
+---
+
+### ♿ Accessibility (a11y)
+
+* All inputs must be labeled using `<label>` or `aria-label`
+* Interactive elements (buttons, toggles, etc.) must be keyboard-navigable
+* Ensure `tabIndex`, `role`, and `aria-*` attributes are used when needed
+* Use semantic HTML (e.g. `<button>`, `<section>`, `<nav>`)
+
+---
+
+### 🚫 What Not to Do
+
+* ❌ No class components
+* ❌ No auto-bound methods or legacy lifecycles
+* ❌ No magic numbers — use Tailwind spacing/scale tokens
+* ❌ No business logic in JSX — abstract to functions
+* ❌ No direct DOM manipulation (`document.querySelector`, `ref.current.click()`) unless justified
+
+---
+
+### 🏗️ Architecture Documentation Integration
+
+When a new component is created or updated, automatically append or update the following in `/architecture/components.md`:
+
+* Component name
+* Prop interface
+* Parent feature/domain
+* Description (from JSDoc)
+* Example usage (from tests or docs)
