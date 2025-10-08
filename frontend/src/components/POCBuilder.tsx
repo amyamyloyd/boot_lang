@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -53,7 +53,7 @@ const POCBuilder: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/poc/documents', {
         headers: { Authorization: `Bearer ${token}` }
@@ -62,9 +62,9 @@ const POCBuilder: React.FC = () => {
     } catch (error) {
       console.error('Failed to load documents:', error);
     }
-  };
+  }, [token]);
 
-  const loadPOCs = async () => {
+  const loadPOCs = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/poc/list', {
         headers: { Authorization: `Bearer ${token}` }
@@ -73,7 +73,7 @@ const POCBuilder: React.FC = () => {
     } catch (error) {
       console.error('Failed to load POCs:', error);
     }
-  };
+  }, [token]);
 
   // Load documents and POCs
   useEffect(() => {
