@@ -7,6 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+# Load environment variables FIRST before any other imports
+load_dotenv()
+
 # Import database initialization
 from database import init_db
 
@@ -15,8 +18,6 @@ from auth import router as auth_router
 from user_management import router as user_router
 from admin import router as admin_router
 from poc_api import router as poc_router
-
-load_dotenv()
 
 app = FastAPI(title="Boot_Lang Platform")
 

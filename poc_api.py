@@ -42,8 +42,15 @@ class POCResponse(BaseModel):
     directory: str
     files: List[str]
 
-# Initialize POC Agent (singleton)
-poc_agent = POCAgent()
+# Initialize POC Agent (lazy initialization)
+_poc_agent = None
+
+def get_poc_agent():
+    """Lazy initialization of POC Agent"""
+    global _poc_agent
+    if _poc_agent is None:
+        _poc_agent = POCAgent()
+    return _poc_agent
 
 
 @router.post("/upload")
@@ -81,8 +88,9 @@ async def upload_document(
     
     # Load and process document
     try:
-        docs = poc_agent.load_document(file_path, file_ext)
-        poc_agent.create_vector_store(docs, str(current_user.id))
+        agent = get_poc_agent()
+        docs = agent.load_document(file_path, file_ext)
+        agent.create_vector_store(docs, str(current_user.id))
         
         # Extract content for database
         content_text = "\n".join([doc.page_content for doc in docs])
@@ -168,7 +176,8 @@ def chat_with_agent(
     Processes user message and returns agent response with conversation tracking.
     """
     try:
-        result = poc_agent.process_request(
+        agent = get_poc_agent()
+        result = agent.process_request(
             prompt=request.prompt,
             user_id=str(current_user.id),
             document_ids=request.document_ids,
@@ -193,7 +202,8 @@ def generate_poc(
     Creates directory structure and markdown files for implementation.
     """
     try:
-        result = poc_agent.generate_poc(
+        agent = get_poc_agent()
+        result = agent.generate_poc(
             requirements=request.requirements,
             user_id=str(current_user.id)
         )
@@ -345,7 +355,8 @@ def update_poc(
     
     # Regenerate phase files
     try:
-        result = poc_agent.generate_poc(
+        agent = get_poc_agent()
+        result = agent.generate_poc(
             requirements=request.requirements,
             user_id=str(current_user.id)
         )
