@@ -137,7 +137,8 @@ class SetupHandler(BaseHTTPRequestHandler):
                         "static_web_app_url": data.get("static_web_app_url", ""),
                         "resource_group": data.get("resource_group", ""),
                         "subscription_id": data.get("subscription_id", ""),
-                        "region": data.get("region", "eastus2")
+                        "region": data.get("region", "eastus2"),
+                        "publish_profile": data.get("publish_profile", "")
                     },
                     "git_deployment": {
                         "github_repo_url": data.get("github_repo_url", ""),
@@ -245,7 +246,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                 print("Received data:", json.dumps(data, indent=2))
                 
                 # Validate required fields
-                required = ['user_name', 'project_name', 'openai_api_key', 'github_repo_url', 'app_service_name', 'resource_group']
+                required = ['user_name', 'project_name', 'openai_api_key', 'github_repo_url', 'app_service_name', 'resource_group', 'publish_profile']
                 missing = [f for f in required if not data.get(f) or not str(data.get(f)).strip()]
                 
                 print(f"Missing fields: {missing}")
@@ -277,7 +278,8 @@ class SetupHandler(BaseHTTPRequestHandler):
                         "static_web_app_url": data.get("static_web_app_url", ""),
                         "resource_group": data.get("resource_group"),
                         "subscription_id": data.get("subscription_id", ""),
-                        "region": data.get("region", "eastus2")
+                        "region": data.get("region", "eastus2"),
+                        "publish_profile": data.get("publish_profile")
                     },
                     "git_deployment": {
                         "github_repo_url": data.get("github_repo_url"),

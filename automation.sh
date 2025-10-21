@@ -72,7 +72,28 @@ cat > test_deploy/index.html << EOF
 EOF
 echo "DONE:Building test page" >> setup_progress.log
 
-# Step 5: Push to GitHub
+# Step 5: Configure GitHub Secrets for deployment
+echo "PROGRESS:Configuring deployment secrets" >> setup_progress.log
+
+# Read publish profile from config
+PUBLISH_PROFILE=$(python3 -c "import json; print(json.load(open('user_config.json'))['azure_settings']['publish_profile'])" 2>/dev/null || echo "")
+
+if [ -n "$PUBLISH_PROFILE" ]; then
+    # Save publish profile to temp file
+    echo "$PUBLISH_PROFILE" > .publish_profile.tmp
+    
+    # Use GitHub CLI to create secret (requires gh auth login first)
+    if command -v gh &> /dev/null; then
+        gh secret set AZURE_WEBAPP_PUBLISH_PROFILE < .publish_profile.tmp 2>/dev/null || echo "⚠️ GitHub CLI not authenticated"
+    else
+        echo "⚠️ GitHub CLI not installed - manual secret setup needed"
+    fi
+    
+    rm -f .publish_profile.tmp
+fi
+echo "DONE:Configuring deployment secrets" >> setup_progress.log
+
+# Step 6: Push to GitHub
 echo "PROGRESS:Pushing to GitHub" >> setup_progress.log
 git add . > /dev/null 2>&1
 git commit -m "Setup complete: $PROJECT_NAME" > /dev/null 2>&1 || true

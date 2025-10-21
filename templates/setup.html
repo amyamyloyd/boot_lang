@@ -76,6 +76,10 @@
                         <span class="mr-2">⬜</span>
                         <span>Azure Region</span>
                     </div>
+                    <div id="check-publish_profile" class="flex items-center text-gray-500">
+                        <span class="mr-2">⬜</span>
+                        <span>Publish Profile</span>
+                    </div>
                     <div id="check-openai_model_preference" class="flex items-center text-gray-500">
                         <span class="mr-2">⬜</span>
                         <span>OpenAI Model</span>
@@ -276,6 +280,19 @@
                                 <option value="southeastasia">Southeast Asia</option>
                             </select>
                         </div>
+                        
+                        <div>
+                            <label for="publish_profile_file" class="block text-sm font-medium text-gray-700">App Service Publish Profile *</label>
+                            <input type="file" id="publish_profile_file" name="publish_profile_file" accept=".PublishSettings,.xml" required
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <input type="hidden" id="publish_profile" name="publish_profile" value="">
+                            <p class="mt-1 text-sm text-gray-500">
+                                1. Enable "SCM Basic Auth" in App Service → Configuration<br>
+                                2. Download publish profile: App Service → Deployment Center → Manage publish profile → Download<br>
+                                3. Upload the .PublishSettings file here
+                            </p>
+                            <div id="profile-status" class="mt-2 text-sm text-gray-500">No file selected</div>
+                        </div>
                     </div>
                 </div>
 
@@ -349,7 +366,7 @@
         // Field tracking for progress  
         const requiredFields = [
             'user_name', 'project_name', 'github_repo_url', 'openai_api_key',
-            'app_service_name', 'resource_group', 'region'
+            'app_service_name', 'resource_group', 'region', 'publish_profile'
         ];
         
         const optionalFields = [
@@ -392,6 +409,7 @@
                 document.getElementById('resource_group').value = config.azure_settings.resource_group || '';
                 document.getElementById('subscription_id').value = config.azure_settings.subscription_id || '';
                 document.getElementById('region').value = config.azure_settings.region || 'eastus2';
+                document.getElementById('publish_profile').value = config.azure_settings.publish_profile || '';
                 document.getElementById('use_prd_tool').checked = config.preferences.use_prd_tool;
                 document.getElementById('auto_deploy').checked = config.preferences.auto_deploy;
                 document.getElementById('openai_model_preference').value = config.preferences.openai_model_preference || 'gpt-4';
@@ -409,8 +427,19 @@
         function checkRequiredFields() {
             const allFilled = requiredFields.every(field => {
                 const input = document.getElementById(field);
-                return input && input.value && input.value.trim() !== '';
+                if (!input) {
+                    console.log('Field not found:', field);
+                    return false;
+                }
+                const value = input.value ? input.value.trim() : '';
+                if (!value) {
+                    console.log('Field empty:', field);
+                    return false;
+                }
+                return true;
             });
+            
+            console.log('All fields filled:', allFilled, 'Git initialized:', gitInitialized);
             
             const submitBtn = document.getElementById('complete-setup-btn');
             if (allFilled && gitInitialized) {
@@ -518,6 +547,53 @@
             }
         });
 
+        // Handle publish profile file upload
+        document.getElementById('publish_profile_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const statusDiv = document.getElementById('profile-status');
+            
+            if (!file) {
+                statusDiv.innerHTML = '<span class="text-gray-500">No file selected</span>';
+                document.getElementById('publish_profile').value = '';
+                updateProgress();
+                return;
+            }
+            
+            statusDiv.innerHTML = '<span class="text-blue-600">⏳ Reading file...</span>';
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                const content = event.target.result;
+                console.log('File loaded, length:', content.length);
+                
+                // Store in hidden field
+                const hiddenField = document.getElementById('publish_profile');
+                hiddenField.value = content;
+                console.log('Hidden field set, value length:', hiddenField.value.length);
+                
+                // Show success
+                statusDiv.innerHTML = '<span class="text-green-600 font-semibold">✓ Profile loaded: ' + file.name + ' (' + content.length + ' bytes)</span>';
+                
+                // Update checklist
+                const check = document.getElementById('check-publish_profile');
+                if (check) {
+                    check.innerHTML = '<span class="mr-2 text-green-600">✅</span><span class="text-green-600">Publish Profile</span>';
+                }
+                
+                // Trigger progress update
+                updateProgress();
+            };
+            
+            reader.onerror = function() {
+                statusDiv.innerHTML = '<span class="text-red-600">✗ Failed to read file</span>';
+                document.getElementById('publish_profile').value = '';
+                updateProgress();
+            };
+            
+            reader.readAsText(file);
+        });
+
         // Listen for input changes
         document.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('input', updateProgress);
@@ -587,6 +663,7 @@
                 resource_group: document.getElementById('resource_group').value || '',
                 subscription_id: document.getElementById('subscription_id').value || '',
                 region: document.getElementById('region').value || 'eastus2',
+                publish_profile: document.getElementById('publish_profile').value || '',
                 use_prd_tool: document.getElementById('use_prd_tool').checked,
                 auto_deploy: document.getElementById('auto_deploy').checked,
                 openai_model_preference: document.getElementById('openai_model_preference').value || 'gpt-4',
@@ -595,6 +672,7 @@
 
             // Debug: log what we're sending
             console.log('Submitting data:', data);
+            console.log('Publish profile length:', data.publish_profile ? data.publish_profile.length : 0);
             
             // Disable button
             const submitBtn = document.getElementById('complete-setup-btn');

@@ -7,4 +7,6 @@ PROGRESS:Initializing database
 DONE:Initializing database
 PROGRESS:Building test page
 DONE:Building test page
+PROGRESS:Configuring deployment secrets
+DONE:Configuring deployment secrets
 PROGRESS:Pushing to GitHub
