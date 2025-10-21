@@ -31,3 +31,5 @@ ENV/
 Thumbs.db
 
 *.PublishSettings
+restore_bootlang.sh
+.github/workflows/deploy.yml.backup
