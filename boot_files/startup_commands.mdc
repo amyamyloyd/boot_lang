@@ -1,0 +1,96 @@
+**Standard Commands - Detailed Spec**
+
+**Git/Version Control:**
+
+1. **"Commit the code"**
+   - Rule: git.mdc
+   - Action: Stage all changes, generate commit message from recent changes, commit
+   - Confirmation: Shows commit message, asks "Commit this?"
+
+2. **"Roll back to last commit"**
+   - Rule: git.mdc
+   - Action: git reset --hard HEAD~1
+   - Confirmation: "This will delete uncommitted work. Continue?"
+
+3. **"Show recent commits"**
+   - Rule: git.mdc
+   - Action: git log --oneline -10, display in chat
+
+**Deployment:**
+
+4. **"Deploy to Azure"**
+   - Rule: azure.mdc
+   - Action: Verify tests pass, push to main, monitor deployment
+   - Confirmation: "Deploy to production?"
+
+5. **"Check deployment status"**
+   - Rule: azure.mdc
+   - Action: az webapp log tail, show recent logs
+
+**Services:**
+
+6. **"Restart services"**
+   - Rule: python.mdc + react.mdc
+   - Action: Kill uvicorn + npm, restart both
+   - Confirmation: None
+
+7. **"Start backend"**
+   - Rule: python.mdc
+   - Action: venv/bin/python app.py
+   - Confirmation: None
+
+8. **"Start frontend"**
+   - Rule: react.mdc
+   - Action: cd frontend && npm start
+   - Confirmation: None
+
+9. **"Stop all services"**
+   - Rule: guard.mdc
+   - Action: Kill all running servers
+   - Confirmation: None
+
+**PRD/Development:**
+
+10. **"Build my PRD"**
+    - Rule: prd.mdc
+    - Action: Find latest in /prd/, read it, confirm understanding, generate imp_plan, build
+    - Confirmation: "Build [app name]?"
+
+11. **"Help me build a PRD"**
+    - Rule: prd.mdc
+    - Action: Ask questions, create PRD in /prd/
+    - Confirmation: "Save PRD as [name]?"
+
+12. **"Show my config"**
+    - Rule: guard.mdc
+    - Action: Read and display user_config.json
+    - Confirmation: None
+
+**Troubleshooting:**
+
+13. **"Check Azure logs"**
+    - Rule: azure.mdc
+    - Action: az webapp log tail, filter for errors
+    - Confirmation: None
+
+14. **"Check for errors"**
+    - Rule: guard.mdc
+    - Action: Scan backend logs, frontend console, Azure logs
+    - Confirmation: None
+
+15. **"Test the app"**
+    - Rule: guard.mdc
+    - Action: Run venv/bin/pytest, report results
+    - Confirmation: None
+
+**Setup:**
+
+16. **"Run welcome"**
+    - Rule: guard.mdc
+    - Action: ./welcome.sh (starts config webpage on localhost:8001)
+    - Confirmation: None
+
+**16 commands total.**
+---
+alwaysApply: true
+---

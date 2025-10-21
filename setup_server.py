@@ -1,0 +1,204 @@
+"""
+Setup Server - Configuration webpage for Boot_Lang initial setup.
+
+Uses Python's built-in http.server - no external dependencies needed.
+"""
+
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
+import os
+import urllib.parse
+
+class SetupHandler(BaseHTTPRequestHandler):
+    """Handle setup webpage requests."""
+    
+    def do_GET(self):
+        """Serve the setup page."""
+        if self.path == '/setup' or self.path == '/':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            
+            template_path = os.path.join("templates", "setup.html")
+            with open(template_path, 'rb') as f:
+                self.wfile.write(f.read())
+                
+        elif self.path == '/config':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            
+            if os.path.exists('user_config.json'):
+                with open('user_config.json', 'r') as f:
+                    self.wfile.write(f.read().encode())
+            else:
+                default_config = {
+                    "setup_complete": False,
+                    "user_identity": {"user_name": "", "project_name": ""},
+                    "api_keys": {
+                        "openai_api_key": "",
+                        "anthropic_api_key": "",
+                        "langsmith_api_key": ""
+                    },
+                    "azure_settings": {
+                        "app_service_name": "",
+                        "static_web_app_url": "",
+                        "resource_group": "",
+                        "subscription_id": "",
+                        "region": "eastus2"
+                    },
+                    "git_deployment": {
+                        "github_repo_url": "",
+                        "deployment_branch": "main"
+                    },
+                    "preferences": {
+                        "use_prd_tool": True,
+                        "auto_deploy": False,
+                        "openai_model_preference": "gpt-4",
+                        "timezone": "UTC"
+                    }
+                }
+                self.wfile.write(json.dumps(default_config).encode())
+        else:
+            self.send_error(404)
+    
+    def do_POST(self):
+        """Handle save requests."""
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        
+        try:
+            data = json.loads(post_data.decode('utf-8'))
+            
+            if self.path == '/save-progress':
+                # Save partial config
+                config_dict = {
+                    "setup_complete": False,
+                    "user_identity": {
+                        "user_name": data.get("user_name", ""),
+                        "project_name": data.get("project_name", "")
+                    },
+                    "api_keys": {
+                        "openai_api_key": data.get("openai_api_key", ""),
+                        "anthropic_api_key": data.get("anthropic_api_key", ""),
+                        "langsmith_api_key": data.get("langsmith_api_key", "")
+                    },
+                    "azure_settings": {
+                        "app_service_name": data.get("app_service_name", ""),
+                        "static_web_app_url": data.get("static_web_app_url", ""),
+                        "resource_group": data.get("resource_group", ""),
+                        "subscription_id": data.get("subscription_id", ""),
+                        "region": data.get("region", "eastus2")
+                    },
+                    "git_deployment": {
+                        "github_repo_url": data.get("github_repo_url", ""),
+                        "deployment_branch": "main"
+                    },
+                    "preferences": {
+                        "use_prd_tool": data.get("use_prd_tool", True),
+                        "auto_deploy": data.get("auto_deploy", False),
+                        "openai_model_preference": data.get("openai_model_preference", "gpt-4"),
+                        "timezone": data.get("timezone", "UTC")
+                    }
+                }
+                
+                with open('user_config.json', 'w') as f:
+                    json.dump(config_dict, f, indent=2)
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "message": "Progress saved"}).encode())
+                
+            elif self.path == '/complete-setup':
+                # Validate required fields
+                required = ['user_name', 'project_name', 'openai_api_key', 'github_repo_url', 'app_service_name', 'resource_group']
+                missing = [f for f in required if not data.get(f)]
+                
+                if missing:
+                    self.send_response(400)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "detail": f"Required fields missing: {', '.join(missing)}"
+                    }).encode())
+                    return
+                
+                # Save complete config
+                config_dict = {
+                    "setup_complete": True,
+                    "user_identity": {
+                        "user_name": data.get("user_name"),
+                        "project_name": data.get("project_name")
+                    },
+                    "api_keys": {
+                        "openai_api_key": data.get("openai_api_key"),
+                        "anthropic_api_key": data.get("anthropic_api_key", ""),
+                        "langsmith_api_key": data.get("langsmith_api_key", "")
+                    },
+                    "azure_settings": {
+                        "app_service_name": data.get("app_service_name"),
+                        "static_web_app_url": data.get("static_web_app_url", ""),
+                        "resource_group": data.get("resource_group"),
+                        "subscription_id": data.get("subscription_id", ""),
+                        "region": data.get("region", "eastus2")
+                    },
+                    "git_deployment": {
+                        "github_repo_url": data.get("github_repo_url"),
+                        "deployment_branch": "main"
+                    },
+                    "preferences": {
+                        "use_prd_tool": data.get("use_prd_tool", True),
+                        "auto_deploy": data.get("auto_deploy", False),
+                        "openai_model_preference": data.get("openai_model_preference", "gpt-4"),
+                        "timezone": data.get("timezone", "UTC")
+                    }
+                }
+                
+                with open('user_config.json', 'w') as f:
+                    json.dump(config_dict, f, indent=2)
+                
+                print("✓ Configuration saved successfully")
+                print("✓ Shutting down setup server...")
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "success": True,
+                    "message": "Configuration complete!",
+                    "config": config_dict
+                }).encode())
+                
+                # Shutdown server
+                import threading
+                threading.Thread(target=self.server.shutdown).start()
+            else:
+                self.send_error(404)
+                
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": str(e)}).encode())
+    
+    def log_message(self, format, *args):
+        """Suppress log messages."""
+        pass
+
+
+if __name__ == "__main__":
+    print("=" * 60)
+    print("Boot_Lang Configuration Webpage")
+    print("=" * 60)
+    print("\nOpen your browser to: http://localhost:8001/setup")
+    print("\nFill in your configuration details and click 'Save & Complete Setup'")
+    print("=" * 60)
+    print()
+    
+    server = HTTPServer(('0.0.0.0', 8001), SetupHandler)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\n\n✓ Setup server stopped")
+        server.shutdown()

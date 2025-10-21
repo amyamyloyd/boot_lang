@@ -1,0 +1,30 @@
+{
+  "setup_complete": false,
+  "user_identity": {
+    "user_name": "",
+    "project_name": ""
+  },
+  "api_keys": {
+    "openai_api_key": "",
+    "anthropic_api_key": "",
+    "langsmith_api_key": ""
+  },
+  "azure_settings": {
+    "app_service_name": "",
+    "static_web_app_url": "",
+    "resource_group": "",
+    "subscription_id": "",
+    "region": "eastus2"
+  },
+  "git_deployment": {
+    "github_repo_url": "",
+    "deployment_branch": "main"
+  },
+  "preferences": {
+    "use_prd_tool": true,
+    "auto_deploy": false,
+    "openai_model_preference": "gpt-4",
+    "timezone": "UTC"
+  }
+}
+
