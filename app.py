@@ -79,6 +79,44 @@ async def root():
         "version": "1.0.0"
     }
 
+# Config endpoint - serves user configuration for splash page
+@app.get("/api/config")
+async def get_config():
+    """
+    Get user configuration for splash page display.
+    
+    Returns non-sensitive config data.
+    """
+    import json
+    import os
+    
+    config_path = "user_config.json"
+    
+    if not os.path.exists(config_path):
+        return {
+            "user_name": "User",
+            "project_name": "Boot_Lang Project",
+            "setup_complete": False
+        }
+    
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        
+        return {
+            "user_name": config.get("user_identity", {}).get("user_name", "User"),
+            "project_name": config.get("user_identity", {}).get("project_name", "Project"),
+            "github_url": config.get("git_deployment", {}).get("github_repo_url", ""),
+            "setup_complete": config.get("setup_complete", False)
+        }
+    except Exception as e:
+        return {
+            "user_name": "User",
+            "project_name": "Boot_Lang Project",
+            "setup_complete": False,
+            "error": str(e)
+        }
+
 # Login endpoint
 @app.post("/api/login", response_model=LoginResponse)
 async def login(request: LoginRequest):

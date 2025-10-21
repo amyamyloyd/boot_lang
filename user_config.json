@@ -12,7 +12,7 @@
   },
   "azure_settings": {
     "app_service_name": " Scaff1",
-    "static_web_app_url": "https://scaff1-gebdfmeyh4e6c9gv.eastus2-01.azurewebsites.net/",
+    "static_web_app_url": "https://zealous-cliff-0528bad0f.3.azurestaticapps.net",
     "resource_group": "saltair-rg",
     "subscription_id": "d4db5e5f-9650-4220-accf-e7e6c0d5a894",
     "region": "eastus2"
