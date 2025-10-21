@@ -1,6 +1,6 @@
 {
-  "setup_complete": true,
-  "git_initialized": true,
+  "setup_complete": false,
+  "git_initialized": false,
   "user_identity": {
     "user_name": "Amy Lloyd",
     "project_name": "First Repo Setup "
