@@ -10,8 +10,10 @@ echo "  Boot_Lang Scaffolding Framework"
 echo "=========================================="
 echo ""
 
-# Check if setup already complete
-if [ -f "user_config.json" ] && grep -q '"setup_complete": true' user_config.json; then
+# Check if config has all required data
+HAS_USER=$(python3 -c "import json; c=json.load(open('user_config.json')); print('yes' if c.get('user_identity',{}).get('user_name') else 'no')" 2>/dev/null || echo "no")
+
+if [ "$HAS_USER" == "yes" ] && grep -q '"setup_complete": true' user_config.json; then
     echo "✓ Setup already complete!"
     echo ""
     echo "Configuration loaded from user_config.json"
@@ -192,14 +194,21 @@ echo "PROGRESS:Pushing to GitHub..." >> setup_progress.log
 if [ -n "$GITHUB_URL" ]; then
     git add .
     git commit -m "Setup complete: $PROJECT_NAME - Environment configured and test page deployed" || true
-    git push origin main
-    echo "✓ Pushed to GitHub"
+    
+    # Try to push, handle errors gracefully
+    if git push origin main 2>&1; then
+        echo "✓ Pushed to GitHub"
+    else
+        echo "⚠ Git push failed (repo may have existing commits)"
+        echo "  Run 'git pull origin main' to sync, then push manually"
+    fi
     echo "DONE:Pushing to GitHub" >> setup_progress.log
+    
     echo ""
     echo "PROGRESS:Deploying to Azure..." >> setup_progress.log
-    echo "GitHub Actions deploying to Azure..."
+    echo "GitHub Actions will deploy to Azure..."
     echo "This may take 2-3 minutes..."
-    sleep 5
+    sleep 2
     echo "DONE:Deploying to Azure" >> setup_progress.log
     echo ""
 else
@@ -230,4 +239,7 @@ echo "  3. View available commands (tell Cursor: 'Show my config')"
 echo ""
 echo "Happy building! 🚀"
 echo ""
+
+# Kill setup server now that automation is complete
+pkill -f setup_server.py 2>/dev/null || true
 

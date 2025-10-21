@@ -615,37 +615,36 @@
                 
                 const result = await response.json();
                 
-                // Show success and automation message with live progress
+                // Show clean progress page
                 document.body.innerHTML = `
-                    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-                        <div class="max-w-2xl w-full bg-white p-8 rounded-lg shadow-2xl">
-                            <h1 class="text-4xl font-bold text-center text-gray-900 mb-6">✓ Configuration Complete!</h1>
-                            <div class="space-y-6 text-gray-700">
-                                <p class="text-lg text-center">Setting up your Boot_Lang environment...</p>
-                                
-                                <div id="progress-container" class="space-y-2">
-                                    <!-- Progress items will be inserted here -->
+                    <div class="min-h-screen flex items-center justify-center bg-gray-50">
+                        <div class="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
+                            <h1 class="text-3xl font-bold text-green-600 mb-6">✓ Configuration Complete!</h1>
+                            <p class="text-lg mb-6">Setting up your Boot_Lang environment...</p>
+                            
+                            <div id="progress-container" class="space-y-3 mb-6">
+                                <div class="text-gray-500 text-sm">Loading progress...</div>
+                            </div>
+                            
+                            <div id="completion-message" class="hidden">
+                                <div class="bg-green-50 p-4 rounded-md border border-green-200 mb-6">
+                                    <h2 class="text-xl font-bold text-green-800 mb-2">🎉 Setup Complete!</h2>
+                                    <div id="azure-url" class="mb-4"></div>
                                 </div>
                                 
-                                <div id="completion-message" class="hidden mt-8 text-center">
-                                    <div class="bg-green-50 p-6 rounded-lg border border-green-200">
-                                        <h2 class="text-2xl font-bold text-green-800 mb-4">🎉 Setup Complete!</h2>
-                                        <div id="azure-url" class="mb-6"></div>
-                                        <div class="space-y-3">
-                                            <p class="font-semibold text-gray-900">Ready for development!</p>
-                                            <div class="flex gap-4 justify-center">
-                                                <button onclick="window.location.href='http://localhost:3000'" 
-                                                        class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                                    📝 Start PRD Builder
-                                                </button>
-                                                <button onclick="window.close()" 
-                                                        class="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-                                                    ← Back to Cursor
-                                                </button>
-                                            </div>
-                                            <p class="text-xs text-gray-500 mt-4">Tell Cursor: "Build my PRD" to start building</p>
-                                        </div>
+                                <div class="space-y-3">
+                                    <p class="font-semibold">Ready for development!</p>
+                                    <div class="flex gap-4">
+                                        <button onclick="window.location.href='http://localhost:3000'" 
+                                                class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                            📝 Start PRD Builder
+                                        </button>
+                                        <button onclick="window.close()" 
+                                                class="flex-1 px-4 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                                            ← Back to Cursor
+                                        </button>
                                     </div>
+                                    <p class="text-sm text-gray-500 text-center mt-4">Tell Cursor: "Build my PRD" to start building</p>
                                 </div>
                             </div>
                         </div>
@@ -663,12 +662,15 @@
                         const response = await fetch('/progress');
                         const data = await response.json();
                         
+                        console.log('Progress data:', data);
+                        
                         // Update progress display
                         progressContainer.innerHTML = data.progress.map(item => `
                             <div class="flex items-center p-3 bg-gray-50 rounded">
                                 <span class="mr-3 text-xl">${item.status === 'done' ? '✅' : '⏳'}</span>
-                                <span class="${item.status === 'done' ? 'text-green-700' : 'text-gray-700'}">${item.task}</span>
-                                ${item.status === 'done' ? '<span class="ml-auto text-green-600 font-semibold">DONE</span>' : ''}
+                                <span class="${item.status === 'done' ? 'text-green-700 font-medium' : 'text-gray-700'}">
+                                    ${item.task}${item.status === 'done' ? ' <span class="text-green-600">DONE</span>' : '...'}
+                                </span>
                             </div>
                         `).join('');
                         

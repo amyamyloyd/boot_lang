@@ -287,7 +287,15 @@ class SetupHandler(BaseHTTPRequestHandler):
                     json.dump(config_dict, f, indent=2)
                 
                 print("✓ Configuration saved successfully")
-                print("✓ Shutting down setup server...")
+                print("✓ Starting automation in background...")
+                
+                # Trigger automation script in background
+                import subprocess
+                subprocess.Popen(
+                    ['bash', 'automation.sh'],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
@@ -298,9 +306,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                     "config": config_dict
                 }).encode())
                 
-                # Shutdown server
-                import threading
-                threading.Thread(target=self.server.shutdown).start()
+                # Server stays alive to serve /progress during automation
             else:
                 self.send_error(404)
                 
