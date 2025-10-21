@@ -186,9 +186,9 @@ class SetupHandler(BaseHTTPRequestHandler):
                         check=False
                     )
                     
-                    # Push to GitHub
+                    # Push to GitHub (force push to overwrite any auto-generated README)
                     result = subprocess.run(
-                        ['git', 'push', '-u', 'origin', 'main'],
+                        ['git', 'push', '-u', 'origin', 'main', '--force'],
                         capture_output=True, text=True
                     )
                     
@@ -196,7 +196,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                         # Try creating main branch first
                         subprocess.run(['git', 'branch', '-M', 'main'], check=False)
                         result = subprocess.run(
-                            ['git', 'push', '-u', 'origin', 'main'],
+                            ['git', 'push', '-u', 'origin', 'main', '--force'],
                             capture_output=True, text=True, check=True
                         )
                     
