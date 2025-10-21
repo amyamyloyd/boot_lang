@@ -3,6 +3,13 @@
 
 set -e
 
+# Ensure we're on main branch
+CURRENT_BRANCH=$(git branch --show-current)
+if [ "$CURRENT_BRANCH" != "main" ]; then
+    echo "Switching from $CURRENT_BRANCH to main branch..."
+    git checkout main
+fi
+
 # Load configuration
 USER_NAME=$(python3 -c "import json; print(json.load(open('user_config.json'))['user_identity']['user_name'])")
 PROJECT_NAME=$(python3 -c "import json; print(json.load(open('user_config.json'))['user_identity']['project_name'])")

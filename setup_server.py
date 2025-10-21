@@ -41,20 +41,13 @@ class SetupHandler(BaseHTTPRequestHandler):
                     if line.startswith('PROGRESS:'):
                         task = line.replace('PROGRESS:', '')
                         progress.append({"task": task, "status": "running"})
-                        print(f"Added task: '{task}'")
                     elif line.startswith('DONE:'):
                         task = line.replace('DONE:', '')
-                        print(f"Marking done: '{task}'")
                         # Update matching task to done
-                        matched = False
                         for p in progress:
-                            print(f"  Comparing '{p['task']}' == '{task}'")
                             if p["task"] == task:
                                 p["status"] = "done"
-                                matched = True
-                                print(f"  ✓ Matched!")
-                        if not matched:
-                            print(f"  ✗ No match found")
+                                break
                     elif line.startswith('COMPLETE:'):
                         complete_url = line.replace('COMPLETE:', '')
                 
