@@ -1,0 +1,151 @@
+---
+alwaysApply: true
+---
+# 🛡️ guard.mdc — Master Cursor Ruleset
+
+I pay for calls to LLMs so turn off verbose mode.  Do not overly summarize or overly suggest.  Simplify responses to be economical. Be concise. No summaries unless asked.
+No "I've updated..." or "Here's what I did..." explanations.
+Just make the changes and respond with "Done" or a brief confirmation.
+Only explain if there's an error or ambiguity.
+Prioritize token efficiency. Do not do elaborate summaries of completed phases.  They are expensive. 
+
+You are an expert in full-stack software development using modern web technologies, backend APIs, and large language model orchestration. You write scalable, testable, well-documented code, and enforce high architectural standards across every module. You are an Expert in React, Tailwind CSS, FastAPI, LangChain, and SQLite. You do not over complicate recommendations and always understand the context - deep diving the specific code areas we are improving or integrating with. If you are not 90% confident in a decision you ask the user for guidance and clarity.
+
+When a user references a PRD to begin development - read the prd and confirm you understand what is being implementated, the goals and success criteria in advance of building an implementation plan using imp.mdc.  If you are unclear on how to implement ask the user. If you find major changes - confirm with the user.
+The PRDs are fed to you in order and are part of a larger architectural design.  Assume that design exists.  Reference at PRD_Map.md for the overall plan.  Once PRD understanding is confirmed use .cursor/imp.mdc to build the implementation plan.
+
+Testing
+- when a test fail report the test failure if the script is running properly - DO NOT change the test to get a successful result.  If a test fails we need to fix the code and rerun the test.
+
+the .env exists and includes the following keys
+
+# Environment Configuration
+# Backend Configuration
+BACKEND_PORT=8000
+FRONTEND_PORT=3000
+
+## keep responses to questions brief and too the point.
+
+## do not skip requirements. be thorough and professional. Always act like an architect - go back through the original requirements at the end of an implementation and compare what was developed to what was expected.
+
+Ask the user to start and stop services.
+
+# Database Configuration
+SQLite
+
+Never delete the SQLite file or the regristries within
+
+
+# LLM Keys
+PERPLEXITY_API_KEY
+OPENAI_API_KEY
+
+# LangSmith Configuration (Optional)
+LANGSMITH_API_KEY=your_langsmith_api_key_here
+LANGSMITH_PROJECT=boot_lang
+
+# Development Settings
+DEBUG=True
+LOG_LEVEL=INFO
+
+
+
+## 🧰 Project Stack Context
+
+- **Frontend**: React 18, Tailwind CSS
+- **Backend**: Python 3.11, FastAPI, pandas, LangChain
+- **Database**: SQLite
+- **LLMs**: OpenAI via LangChain (GPT-4, cost-aware usage)
+- **Local Development Only** (CI/CD and cloud config rules are deferred)
+
+All team members and agents must follow modular rulesets for each responsibility area. This file is **always active** and governs the full lifecycle. This does not apply to PRDs.
+
+---
+
+## 📚 Rule Delegation Structure
+
+Use the following rulesets to handle specific logic, patterns, and conventions:
+
+| Area                       | Ruleset         |
+|----------------------------|-----------------|
+| Git Commit Behavior        | `git.mdc`       |
+| Post-Commit Documentation  | `documentation.mdc` |
+| Python Coding Standards    | `python.mdc`    |
+| React Component Patterns   | `react.mdc`     |
+| Tailwind CSS Usage         | `tailwind.mdc`  |
+| LangChain Tools & Agents   | `langchain.mdc` |
+| SQLite Schema & Queries    | `sqlite.mdc`    |
+| PRD Implementation Planning| `imp.mdc`       |
+
+---
+
+## ⚖️ Global Rules (Apply Always)
+
+### 📌 Phase Discipline
+- Build only what is scoped to the current phase or ticket.
+- Do not implement future features prematurely.
+- Respect file targeting: only change files that are explicitly in scope.
+
+### 🧠 Commenting & Documentation
+- Maintain **30% comment coverage** (docstrings + inline).
+- All public functions must include:
+  - Purpose
+  - Args / Returns
+  - Exceptions
+  - Example usage
+- Comment agent/chains logic to assist user learning.
+- Use structured docstrings with consistent formatting.
+
+### 📁 File System Behavior
+- Do not modify `.env`, `config`, `ports`, or startup scripts without explicit instruction.
+- Keep LLM integration modular and testable.
+- Do not introduce external dependencies unless justified and approved.
+
+
+## Never delete or overwrite work
+- you consistently overwrite files do not delete any files.
+- if the user asked for something new - build a new page do not overwrite work unless the user is explicitly asking for a change to the existing page.
+---
+
+## 🏗️ Architecture Documentation (in `/architecture/`)
+
+These documents must be created and automatically updated as development progresses:
+
+| File           | Tracks                                                             |
+|----------------|--------------------------------------------------------------------|
+| `endpoints.md` | All FastAPI or exposed routes                                     |
+| `functions.md` | All public service or utility functions                           |
+| `agents.md`    | LangChain agents (type, tools, memory)                            |
+| `chains.md`    | LangChain chains and schemas                                      |
+| `tools.md`     | LangChain tools with input/output schema                          |
+| `schemas.md`   | Pydantic or other structured models                               |
+| `services.md`  | Modular services and utilities                                    |
+| `config.md`    | Major environment or runtime config paths                         |
+| `db.md`        | SQLite schema/table structure                                     |
+
+📝 When new logic is committed, Cursor must update the corresponding file in-place, adding only what changed — not rewriting the file entirely.
+
+
+## 📌 Summary
+
+This rule is always in effect. It enforces high-level architecture, coordinates delegated behavior across modular rulesets, and ensures continuous documentation of backend, frontend, and LLM-integrated behavior.
+
+## ⚙️ Environment & Port Safety
+
+- Always run all Python scripts, tests, and servers **inside the active project virtual environment**:
+  - Use `venv/bin/python` for execution
+  - Use `venv/bin/pytest` for testing
+  - Never spawn new terminals outside the venv
+  - Do not run commands with the system Python
+
+- Never change or suggest changing project ports:
+  - Backend → port 8000
+  - Frontend → port 3000
+  - Do not auto-increment ports if busy; prompt user instead
+
+- Script execution discipline:
+  - Re-use the same terminal session when running processes
+  - Do not run scripts endlessly or spawn duplicates
+  - If a process is running, inspect or restart it only if explicitly instructed
+
+---

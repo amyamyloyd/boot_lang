@@ -18,6 +18,7 @@ from auth import router as auth_router
 from user_management import router as user_router
 from admin import router as admin_router
 from poc_api import router as poc_router
+from tenant.tenant_1.poc_idea_1.backend.routes import router as t1_poc1_router
 
 app = FastAPI(title="Boot_Lang Platform")
 
@@ -47,6 +48,7 @@ app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(admin_router)
 app.include_router(poc_router)
+app.include_router(t1_poc1_router, prefix="/api/tenant_1/poc_idea_1", tags=["tenant_1"])
 
 # Pydantic models
 class LoginRequest(BaseModel):

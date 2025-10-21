@@ -1,0 +1,222 @@
+---
+alwaysApply: false
+---
+fileType: markdown
+name: imp.mdc
+description: Translates PRD files into structured implementation plans saved under /imp/, guiding dev and AI execution in logical, traceable phases.
+---
+You are an expert technical architect and systems implementer. Your role is to convert any PRD (Product Requirements Document) into a concrete, actionable implementation plan that is easy to follow, consistently formatted, and optimized for both human and AI development workflows.
+
+you should update the plan after each phase is complete and run a commit
+
+Always have a test strategy and means to prove the implemenation is working.
+
+
+## 📁 Output Location
+
+Every implementation plan must be saved under:
+
+```
+
+/imp_plans/<slugified-prd-name>.md
+
+````
+
+Where `<slugified-prd-name>` matches the original PRD file from `/prd/<name>.md`.
+
+---
+
+## 📐 File Structure
+
+Each implementation plan must include:
+
+```markdown
+# Implementation Plan Template
+
+## Project Information
+- **Project Name**: [Project/Feature Name]
+- **Created By**: [Developer Name]
+- **Date**: [YYYY-MM-DD]
+- **Priority**: [High/Medium/Low]
+- **Estimated Effort**: [X hours/days]
+
+## Overview
+### Problem Statement
+[Describe the problem or requirement that this implementation addresses]
+
+### Solution Summary
+[Brief description of the proposed solution]
+
+### Success Criteria
+- [ ] [Specific, measurable outcome 1]
+- [ ] [Specific, measurable outcome 2]
+- [ ] [Specific, measurable outcome 3]
+
+## Technical Requirements
+
+### Core Tech Stack (NEVER CHANGE)
+- **Frontend**: React 18 + `xlsx` + `axios` + Tailwind CSS
+- **Backend**: Python 3.11 + FastAPI + Langchain + pandas + SQLite + `openpyxl`
+- **AI**: ChatGPT-4 (cost-optimized)
+- **Deployment**: Azure Static Web Apps + Azure App Service
+
+### Dependencies
+#### New Dependencies Required
+- [ ] [Package Name] - [Purpose and version]
+- [ ] [Package Name] - [Purpose and version]
+
+#### Existing Dependencies Used
+- [ ] [Package Name] - [How it will be used]
+
+### Database Changes
+- [ ] [Schema changes required]
+- [ ] [Migration scripts needed]
+- [ ] [Data transformation required]
+
+### API Changes
+- [ ] [New endpoints to create]
+- [ ] [Existing endpoints to modify]
+- [ ] [Request/response model changes]
+
+## Implementation Phases
+
+### Phase 1: Foundation Setup
+**Duration**: [X hours]
+**Dependencies**: None
+
+#### Tasks
+- [ ] Set up development environment
+- [ ] Create necessary file structure
+- [ ] Install and configure dependencies
+- [ ] Set up logging and error handling
+- [ ] Create basic test framework
+
+#### Deliverables
+- [ ] [Specific deliverable 1]
+- [ ] [Specific deliverable 2]
+
+#### Testing
+- [ ] Unit tests for foundation components
+- [ ] Integration tests for setup
+- [ ] Manual testing checklist
+
+### Phase 2: Core Implementation
+**Duration**: [X hours]
+**Dependencies**: Phase 1 complete
+
+#### Tasks
+- [ ] [Core feature implementation task 1]
+- [ ] [Core feature implementation task 2]
+- [ ] [Core feature implementation task 3]
+- [ ] Error handling implementation
+- [ ] Input validation implementation
+
+#### Deliverables
+- [ ] [Specific deliverable 1]
+- [ ] [Specific deliverable 2]
+
+#### Testing
+- [ ] Unit tests for core functionality
+- [ ] Integration tests for feature
+- [ ] Manual testing checklist
+
+### Phase 3: Integration & Testing
+**Duration**: [X hours]
+**Dependencies**: Phase 2 complete
+
+#### Tasks
+- [ ] [Integration task 1]
+- [ ] [Integration task 2]
+- [ ] End-to-end testing
+- [ ] Performance testing
+- [ ] Security testing
+
+#### Deliverables
+- [ ] [Specific deliverable 1]
+- [ ] [Specific deliverable 2]
+
+#### Testing
+- [ ] Full test suite execution
+- [ ] Performance benchmarks
+- [ ] Security audit
+
+### Phase 4: Documentation & Deployment
+**Duration**: [X hours]
+**Dependencies**: Phase 3 complete
+
+#### Tasks
+- [ ] Update API documentation
+- [ ] Update function catalog
+- [ ] Create user documentation
+- [ ] Deploy to staging environment
+- [ ] Deploy to production environment
+
+#### Deliverables
+- [ ] [Specific deliverable 1]
+- [ ] [Specific deliverable 2]
+
+#### Testing
+- [ ] Documentation review
+- [ ] Staging environment testing
+- [ ] Production deployment verification
+
+## File Structure
+
+### Files to Create
+```
+[File Path]
+├── [New file 1] - [Purpose]
+├── [New file 2] - [Purpose]
+└── [New file 3] - [Purpose]
+```
+
+### Files to Modify
+```
+[File Path]
+├── [File 1] - [What changes]
+├── [File 2] - [What changes]
+└── [File 3] - [What changes]
+```
+
+### Files to Delete
+```
+[File Path]
+├── [File 1] - [Reason for deletion]
+└── [File 2] - [Reason for deletion]
+```
+
+
+## Sign-off
+
+
+### Stakeholder Approval
+- [ ] [Stakeholder Name] - [Date]
+- [ ] [Stakeholder Name] - [Date]
+
+---
+
+## Notes
+[Any additional notes, assumptions, or considerations]
+
+## Change Log
+| Date | Version | Changes | Author |
+|------|---------|---------|--------|
+| [YYYY-MM-DD] | 1.0 | Initial template | [Author] |
+| [YYYY-MM-DD] | 1.1 | [Changes] | [Author] |
+
+---
+
+
+---
+
+
+## 📎 File Checklist
+
+Each imp.md must:
+
+* [x] Be placed in `/imp/`
+* [x] Reference original PRD
+* [x] Contain at least 4–6 clear phases
+* [x] Include folder/file paths and package names
+* [x] Link to affected `.mdc` rule files
+* [x] Document all major deliverables and artifacts

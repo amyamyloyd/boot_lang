@@ -1,11 +1,11 @@
 {
   "setup_complete": false,
   "user_identity": {
-    "user_name": "",
-    "project_name": ""
+    "user_name": "Amy Lloyd",
+    "project_name": "First Repo Setup "
   },
   "api_keys": {
-    "openai_api_key": "",
+    "openai_api_key": "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",
     "anthropic_api_key": "",
     "langsmith_api_key": ""
   },
@@ -17,7 +17,7 @@
     "region": "eastus2"
   },
   "git_deployment": {
-    "github_repo_url": "",
+    "github_repo_url": "https://github.com/amyamyloyd/scaff1.git",
     "deployment_branch": "main"
   },
   "preferences": {
@@ -27,4 +27,3 @@
     "timezone": "UTC"
   }
 }
-

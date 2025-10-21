@@ -110,6 +110,79 @@ class SetupHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"success": True, "message": "Progress saved"}).encode())
                 
+            elif self.path == '/init-git':
+                # Initialize Git and push to GitHub
+                github_url = data.get('github_repo_url', '')
+                
+                if not github_url:
+                    self.send_response(400)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "success": False,
+                        "message": "GitHub URL required"
+                    }).encode())
+                    return
+                
+                try:
+                    import subprocess
+                    
+                    # Remove existing origin if any
+                    subprocess.run(['git', 'remote', 'remove', 'origin'], 
+                                 stderr=subprocess.DEVNULL, check=False)
+                    
+                    # Add new origin
+                    result = subprocess.run(
+                        ['git', 'remote', 'add', 'origin', github_url],
+                        capture_output=True, text=True, check=True
+                    )
+                    
+                    # Create initial commit if needed
+                    subprocess.run(['git', 'add', '.'], check=False)
+                    subprocess.run(
+                        ['git', 'commit', '-m', 'Initial Boot_Lang scaffold setup'],
+                        check=False
+                    )
+                    
+                    # Push to GitHub
+                    result = subprocess.run(
+                        ['git', 'push', '-u', 'origin', 'main'],
+                        capture_output=True, text=True
+                    )
+                    
+                    if result.returncode != 0:
+                        # Try creating main branch first
+                        subprocess.run(['git', 'branch', '-M', 'main'], check=False)
+                        result = subprocess.run(
+                            ['git', 'push', '-u', 'origin', 'main'],
+                            capture_output=True, text=True, check=True
+                        )
+                    
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "success": True,
+                        "message": "Git initialized and pushed to GitHub"
+                    }).encode())
+                    
+                except subprocess.CalledProcessError as e:
+                    self.send_response(500)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "success": False,
+                        "message": f"Git command failed: {e.stderr if hasattr(e, 'stderr') else str(e)}"
+                    }).encode())
+                except Exception as e:
+                    self.send_response(500)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "success": False,
+                        "message": str(e)
+                    }).encode())
+                
             elif self.path == '/complete-setup':
                 # Validate required fields
                 required = ['user_name', 'project_name', 'openai_api_key', 'github_repo_url', 'app_service_name', 'resource_group']

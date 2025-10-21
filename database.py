@@ -198,6 +198,9 @@ def init_db():
     Example:
         python database.py  # Run this script directly to create tables
     """
+    # Import tenant models after Base is defined
+    from tenant.tenant_1.poc_idea_1.backend.models import TaskModel
+    
     Base.metadata.create_all(bind=engine)
     print("✓ Database initialized successfully")
     print(f"✓ Database file: boot_lang.db")

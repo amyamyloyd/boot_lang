@@ -1,0 +1,66 @@
+---
+alwaysApply: false
+---
+fileType: python
+name: langchain.mdc
+description: Standards for LangChain agents, chains, and tools development
+---
+
+## 🔁 LangChain Agent Standards
+
+### 1. Agent Structure
+- Define clear agent purpose and scope
+- Use typed inputs and outputs with Pydantic schemas
+- Implement proper error handling and fallbacks
+
+### 2. Tool Development
+- Each tool should have a single, well-defined responsibility
+- Document input/output schemas clearly
+- Include usage examples in docstrings
+
+### 3. Chain Organization
+- Keep chains modular and composable
+- Separate business logic from LangChain orchestration
+- Use clear naming conventions
+
+---
+
+## 📂 Folder Structure
+
+Organize LangChain components as follows:
+- `/agents/` - Agent definitions and configurations
+- `/chains/` - Chain implementations
+- `/tools/` - Custom tool implementations
+- `/prompts/` - Prompt templates
+
+---
+
+## 🧪 Testing Requirements
+
+- Unit tests required for every agent, chain, and tool
+- Mock LLM calls in tests
+- Validate input/output schema contracts
+- Test error handling and edge cases
+
+---
+
+## 🔐 Safety & Observability
+
+### LangSmith Integration (Optional)
+- Enable tracing with `LANGCHAIN_TRACING_V2=true`
+- Use for debugging and monitoring agent behavior
+
+### Error Handling
+- Use standardized error objects
+- Log all LLM interactions
+- Never surface raw API errors to end users
+
+---
+
+## 📋 Best Practices
+
+- Keep prompts version-controlled and organized
+- Use prompt templates for reusability
+- Implement token usage tracking
+- Consider cost implications of LLM calls
+- Cache results when appropriate

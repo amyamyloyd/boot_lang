@@ -102,6 +102,7 @@ const AppContent: React.FC = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/tenant_1/poc_idea_1/*" element={<div>Tenant 1 POC 1 - Navigate to <a href="http://localhost:3001" target="_blank" rel="noopener noreferrer">http://localhost:3001</a></div>} />
         </Routes>
       </div>
     </div>
