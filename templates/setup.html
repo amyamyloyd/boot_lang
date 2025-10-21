@@ -528,6 +528,8 @@
                         </div>
                     `;
                     statusDiv.classList.remove('hidden');
+                    updateProgress();
+                    checkRequiredFields();
                 } else {
                     throw new Error(result.message || 'Git initialization failed');
                 }
