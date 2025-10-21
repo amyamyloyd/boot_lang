@@ -10,3 +10,9 @@ DONE:Building test page
 PROGRESS:Configuring deployment secrets
 DONE:Configuring deployment secrets
 PROGRESS:Pushing to GitHub
+DONE:Pushing to GitHub
+PROGRESS:Deploying to Azure
+DONE:Deploying to Azure
+PROGRESS:Verifying deployment
+DONE:Verifying deployment
+COMPLETE:
