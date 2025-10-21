@@ -12,9 +12,3 @@ DONE:Configuring GitHub workflows
 PROGRESS:Setting GitHub deployment secret
 DONE:Setting GitHub deployment secret
 PROGRESS:Pushing to GitHub
-DONE:Pushing to GitHub
-PROGRESS:Deploying to Azure via GitHub Actions
-DONE:Deploying to Azure via GitHub Actions
-PROGRESS:Verifying deployment
-DONE:Verifying deployment
-COMPLETE:https://zealous-cliff-0528bad0f.3.azurestaticapps.net
