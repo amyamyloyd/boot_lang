@@ -13,7 +13,7 @@ AZURE_STATIC_URL=$(python3 -c "import json; print(json.load(open('user_config.js
 echo "Starting automation..." > setup_progress.log
 
 # Step 1: Virtual environment
-echo "PROGRESS:Creating virtual environment..." >> setup_progress.log
+echo "PROGRESS:Creating virtual environment" >> setup_progress.log
 if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
@@ -21,18 +21,18 @@ source venv/bin/activate
 echo "DONE:Creating virtual environment" >> setup_progress.log
 
 # Step 2: Install dependencies
-echo "PROGRESS:Installing dependencies..." >> setup_progress.log
+echo "PROGRESS:Installing dependencies" >> setup_progress.log
 pip install --upgrade pip > /dev/null 2>&1
 pip install -r requirements.txt > /dev/null 2>&1
 echo "DONE:Installing dependencies" >> setup_progress.log
 
 # Step 3: Initialize database
-echo "PROGRESS:Initializing database..." >> setup_progress.log
+echo "PROGRESS:Initializing database" >> setup_progress.log
 python3 database.py > /dev/null 2>&1
 echo "DONE:Initializing database" >> setup_progress.log
 
 # Step 4: Build test page
-echo "PROGRESS:Building test page..." >> setup_progress.log
+echo "PROGRESS:Building test page" >> setup_progress.log
 mkdir -p test_deploy
 cat > test_deploy/index.html << EOF
 <!DOCTYPE html>
@@ -73,33 +73,52 @@ EOF
 echo "DONE:Building test page" >> setup_progress.log
 
 # Step 5: Push to GitHub
-echo "PROGRESS:Pushing to GitHub..." >> setup_progress.log
+echo "PROGRESS:Pushing to GitHub" >> setup_progress.log
 git add . > /dev/null 2>&1
 git commit -m "Setup complete: $PROJECT_NAME" > /dev/null 2>&1 || true
 git push origin main > /dev/null 2>&1 || true
 echo "DONE:Pushing to GitHub" >> setup_progress.log
 
-# Step 6: Deploy
-echo "PROGRESS:Deploying to Azure..." >> setup_progress.log
-sleep 3
+# Step 6: Wait for GitHub Actions deployment
+echo "PROGRESS:Deploying to Azure" >> setup_progress.log
+echo "Waiting for GitHub Actions to deploy..."
+sleep 10  # Give GitHub Actions time to start
+echo "DONE:Deploying to Azure" >> setup_progress.log
 
-# Verify deployment by pinging URL
-echo "PROGRESS:Verifying deployment..." >> setup_progress.log
+# Verify deployment by checking URL content
+echo "PROGRESS:Verifying deployment" >> setup_progress.log
+DEPLOYMENT_VERIFIED=false
+
 if [ -n "$AZURE_STATIC_URL" ]; then
-    # Try to ping the URL (max 30 seconds)
-    for i in {1..10}; do
-        if curl -s -o /dev/null -w "%{http_code}" "$AZURE_STATIC_URL" | grep -q "200\|301\|302"; then
-            echo "✓ Deployment verified!"
+    echo "Testing deployment at: $AZURE_STATIC_URL"
+    
+    # Try for up to 2 minutes (GitHub Actions deployment time)
+    for i in {1..24}; do
+        # Get the page content
+        PAGE_CONTENT=$(curl -s "$AZURE_STATIC_URL" 2>/dev/null || echo "")
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$AZURE_STATIC_URL" 2>/dev/null || echo "000")
+        
+        # Check if page loads AND contains our user's name
+        if [ "$HTTP_CODE" = "200" ] && echo "$PAGE_CONTENT" | grep -q "$USER_NAME"; then
+            echo "✓ Deployment verified! Page contains user data (HTTP $HTTP_CODE)"
+            DEPLOYMENT_VERIFIED=true
+            echo "DONE:Verifying deployment" >> setup_progress.log
+            echo "COMPLETE:$AZURE_STATIC_URL" >> setup_progress.log
             break
         fi
-        sleep 3
+        
+        echo "⏳ Waiting for deployment... (attempt $i/24, HTTP $HTTP_CODE)"
+        sleep 5
     done
 fi
-echo "DONE:Deploying to Azure" >> setup_progress.log
-echo "DONE:Verifying deployment" >> setup_progress.log
 
-# Mark complete
-echo "COMPLETE:$AZURE_STATIC_URL" >> setup_progress.log
+if [ "$DEPLOYMENT_VERIFIED" = false ]; then
+    echo "⚠️ Deployment verification failed"
+    echo "  Check: $AZURE_STATIC_URL"
+    echo "  Possible issues: GitHub Actions still running, CORS error, or wrong URL"
+    echo "DONE:Verifying deployment" >> setup_progress.log
+    echo "COMPLETE:" >> setup_progress.log  # Empty URL = verification failed
+fi
 
 # Kill setup server
 sleep 2
