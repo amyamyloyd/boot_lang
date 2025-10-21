@@ -127,14 +127,15 @@ This document captures key architecture decisions for Phase 0 preparation before
 
 **Automation sequence:**
 1. Write `user_config.json` with `setup_complete: true`
-2. Change git remote to user's GitHub repo
-3. Create/activate venv
-4. Install dependencies
-5. Initialize database
-6. Build simple test page (file upload or form)
+2. Create/activate venv
+3. Install dependencies
+4. Initialize database
+5. Build welcome page with user info
+6. Update GitHub workflows with user's app service name
 7. Push to user's GitHub main branch
-8. Trigger Azure deployment
-9. Show success page with:
+8. GitHub Actions automatically deploys to Azure (using secrets set via Azure Portal)
+9. Poll Azure URL to verify deployment
+10. Show success page with:
    - ✅ Configuration saved
    - ✅ Environment ready
    - ✅ Pushed to GitHub: [repo URL]

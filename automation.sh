@@ -16,7 +16,6 @@ PROJECT_NAME=$(python3 -c "import json; print(json.load(open('user_config.json')
 GITHUB_URL=$(python3 -c "import json; print(json.load(open('user_config.json'))['git_deployment']['github_repo_url'])")
 AZURE_STATIC_URL=$(python3 -c "import json; print(json.load(open('user_config.json'))['azure_settings']['static_web_app_url'])" 2>/dev/null || echo "")
 APP_SERVICE_NAME=$(python3 -c "import json; print(json.load(open('user_config.json'))['azure_settings']['app_service_name'])")
-PUBLISH_PROFILE=$(python3 -c "import json; print(json.load(open('user_config.json'))['azure_settings']['publish_profile'])")
 
 # Create progress log
 echo "Starting automation..." > setup_progress.log
@@ -168,41 +167,20 @@ fi
 
 echo "DONE:Configuring GitHub workflows" >> setup_progress.log
 
-# Step 6: Set GitHub secret for backend deployment
-echo "PROGRESS:Setting GitHub deployment secret" >> setup_progress.log
-
-# Save publish profile to temp file
-echo "$PUBLISH_PROFILE" > .publish_profile.tmp
-
-# Set GitHub secret using gh CLI
-if command -v gh &> /dev/null; then
-    if gh auth status > /dev/null 2>&1; then
-        gh secret set AZURE_WEBAPP_PUBLISH_PROFILE < .publish_profile.tmp 2>&1 | tee -a setup_progress.log
-        echo "✓ GitHub secret set successfully"
-    else
-        echo "⚠️ GitHub CLI not authenticated - secret not set, backend deployment may fail"
-    fi
-else
-    echo "⚠️ GitHub CLI not installed - secret not set, backend deployment may fail"
-fi
-
-rm -f .publish_profile.tmp
-echo "DONE:Setting GitHub deployment secret" >> setup_progress.log
-
-# Step 7: Push to GitHub
+# Step 6: Push to GitHub
 echo "PROGRESS:Pushing to GitHub" >> setup_progress.log
 git add . > /dev/null 2>&1
 git commit -m "Setup complete: $PROJECT_NAME" > /dev/null 2>&1 || true
 git push origin main > /dev/null 2>&1 || true
 echo "DONE:Pushing to GitHub" >> setup_progress.log
 
-# Step 8: Wait for GitHub Actions deployment (both frontend + backend)
+# Step 7: Wait for GitHub Actions deployment (both frontend + backend)
 echo "PROGRESS:Deploying to Azure via GitHub Actions" >> setup_progress.log
 echo "Waiting for GitHub Actions to start deployment..."
 sleep 15  # Give GitHub Actions time to start
 echo "DONE:Deploying to Azure via GitHub Actions" >> setup_progress.log
 
-# Step 9: Verify deployment by checking URL content
+# Step 8: Verify deployment by checking URL content
 echo "PROGRESS:Verifying deployment" >> setup_progress.log
 DEPLOYMENT_VERIFIED=false
 
