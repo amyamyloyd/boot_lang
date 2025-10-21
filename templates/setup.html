@@ -669,7 +669,7 @@
                             <div class="flex items-center p-3 bg-gray-50 rounded">
                                 <span class="mr-3 text-xl">${item.status === 'done' ? '✅' : '⏳'}</span>
                                 <span class="${item.status === 'done' ? 'text-green-700 font-medium' : 'text-gray-700'}">
-                                    ${item.task}${item.status === 'done' ? ' <span class="text-green-600">DONE</span>' : '...'}
+                                    ${item.task}... ${item.status === 'done' ? '<span class="text-green-600 font-bold">DONE</span>' : ''}
                                 </span>
                             </div>
                         `).join('');

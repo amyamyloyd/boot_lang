@@ -81,8 +81,22 @@ echo "DONE:Pushing to GitHub" >> setup_progress.log
 
 # Step 6: Deploy
 echo "PROGRESS:Deploying to Azure..." >> setup_progress.log
-sleep 2
+sleep 3
+
+# Verify deployment by pinging URL
+echo "PROGRESS:Verifying deployment..." >> setup_progress.log
+if [ -n "$AZURE_STATIC_URL" ]; then
+    # Try to ping the URL (max 30 seconds)
+    for i in {1..10}; do
+        if curl -s -o /dev/null -w "%{http_code}" "$AZURE_STATIC_URL" | grep -q "200\|301\|302"; then
+            echo "✓ Deployment verified!"
+            break
+        fi
+        sleep 3
+    done
+fi
 echo "DONE:Deploying to Azure" >> setup_progress.log
+echo "DONE:Verifying deployment" >> setup_progress.log
 
 # Mark complete
 echo "COMPLETE:$AZURE_STATIC_URL" >> setup_progress.log
