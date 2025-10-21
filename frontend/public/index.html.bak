@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boot_Lang Development Scaffold</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  <script src="%PUBLIC_URL%/config.js"></script>
-  </head>
+</head>
 <body class="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500">
     <div class="container mx-auto px-4 py-8">
         <!-- Header with User Info -->

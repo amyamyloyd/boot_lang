@@ -5,14 +5,10 @@ PROGRESS:Installing dependencies
 DONE:Installing dependencies
 PROGRESS:Initializing database
 DONE:Initializing database
-PROGRESS:Building test page
-DONE:Building test page
-PROGRESS:Configuring deployment secrets
-DONE:Configuring deployment secrets
+PROGRESS:Building welcome page
+DONE:Building welcome page
+PROGRESS:Configuring GitHub workflows
+DONE:Configuring GitHub workflows
+PROGRESS:Setting GitHub deployment secret
+DONE:Setting GitHub deployment secret
 PROGRESS:Pushing to GitHub
-DONE:Pushing to GitHub
-PROGRESS:Deploying to Azure
-DONE:Deploying to Azure
-PROGRESS:Verifying deployment
-DONE:Verifying deployment
-COMPLETE:
