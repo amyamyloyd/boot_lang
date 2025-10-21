@@ -1,5 +1,6 @@
 {
-  "setup_complete": false,
+  "setup_complete": true,
+  "git_initialized": true,
   "user_identity": {
     "user_name": "Amy Lloyd",
     "project_name": "First Repo Setup "
@@ -10,14 +11,14 @@
     "langsmith_api_key": ""
   },
   "azure_settings": {
-    "app_service_name": "",
-    "static_web_app_url": "",
-    "resource_group": "",
-    "subscription_id": "",
+    "app_service_name": " Scaff1",
+    "static_web_app_url": "https://scaff1-gebdfmeyh4e6c9gv.eastus2-01.azurewebsites.net/",
+    "resource_group": "saltair-rg",
+    "subscription_id": "d4db5e5f-9650-4220-accf-e7e6c0d5a894",
     "region": "eastus2"
   },
   "git_deployment": {
-    "github_repo_url": "https://github.com/amyamyloyd/scaff1.git",
+    "github_repo_url": "https://github.com/amyamyloyd/scaff2.git",
     "deployment_branch": "main"
   },
   "preferences": {

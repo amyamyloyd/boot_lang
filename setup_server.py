@@ -22,6 +22,45 @@ class SetupHandler(BaseHTTPRequestHandler):
             template_path = os.path.join("templates", "setup.html")
             with open(template_path, 'rb') as f:
                 self.wfile.write(f.read())
+        
+        elif self.path == '/progress':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            
+            # Read progress log
+            if os.path.exists('setup_progress.log'):
+                with open('setup_progress.log', 'r') as f:
+                    lines = f.readlines()
+                
+                progress = []
+                complete_url = ""
+                
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith('PROGRESS:'):
+                        task = line.replace('PROGRESS:', '')
+                        progress.append({"task": task, "status": "running"})
+                    elif line.startswith('DONE:'):
+                        task = line.replace('DONE:', '')
+                        # Update matching task to done
+                        for p in progress:
+                            if p["task"] == task:
+                                p["status"] = "done"
+                    elif line.startswith('COMPLETE:'):
+                        complete_url = line.replace('COMPLETE:', '')
+                
+                self.wfile.write(json.dumps({
+                    "progress": progress,
+                    "complete": bool(complete_url),
+                    "url": complete_url
+                }).encode())
+            else:
+                self.wfile.write(json.dumps({
+                    "progress": [],
+                    "complete": False,
+                    "url": ""
+                }).encode())
                 
         elif self.path == '/config':
             self.send_response(200)
@@ -34,6 +73,7 @@ class SetupHandler(BaseHTTPRequestHandler):
             else:
                 default_config = {
                     "setup_complete": False,
+                    "git_initialized": False,
                     "user_identity": {"user_name": "", "project_name": ""},
                     "api_keys": {
                         "openai_api_key": "",
@@ -74,6 +114,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                 # Save partial config
                 config_dict = {
                     "setup_complete": False,
+                    "git_initialized": False,
                     "user_identity": {
                         "user_name": data.get("user_name", ""),
                         "project_name": data.get("project_name", "")
@@ -161,6 +202,14 @@ class SetupHandler(BaseHTTPRequestHandler):
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
                     self.end_headers()
+                    # Save git_initialized flag to config
+                    if os.path.exists('user_config.json'):
+                        with open('user_config.json', 'r') as f:
+                            config = json.load(f)
+                        config['git_initialized'] = True
+                        with open('user_config.json', 'w') as f:
+                            json.dump(config, f, indent=2)
+                    
                     self.wfile.write(json.dumps({
                         "success": True,
                         "message": "Git initialized and pushed to GitHub"
@@ -184,9 +233,14 @@ class SetupHandler(BaseHTTPRequestHandler):
                     }).encode())
                 
             elif self.path == '/complete-setup':
+                # Debug: print received data
+                print("Received data:", json.dumps(data, indent=2))
+                
                 # Validate required fields
                 required = ['user_name', 'project_name', 'openai_api_key', 'github_repo_url', 'app_service_name', 'resource_group']
-                missing = [f for f in required if not data.get(f)]
+                missing = [f for f in required if not data.get(f) or not str(data.get(f)).strip()]
+                
+                print(f"Missing fields: {missing}")
                 
                 if missing:
                     self.send_response(400)
@@ -200,6 +254,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                 # Save complete config
                 config_dict = {
                     "setup_complete": True,
+                    "git_initialized": True,
                     "user_identity": {
                         "user_name": data.get("user_name"),
                         "project_name": data.get("project_name")
