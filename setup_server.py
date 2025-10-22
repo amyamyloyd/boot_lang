@@ -35,6 +35,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                 
                 progress = []
                 complete_url = ""
+                error_message = ""
                 
                 for line in lines:
                     line = line.strip()
@@ -50,17 +51,33 @@ class SetupHandler(BaseHTTPRequestHandler):
                                 break
                     elif line.startswith('COMPLETE:'):
                         complete_url = line.replace('COMPLETE:', '')
+                    elif line.startswith('ERROR:'):
+                        error_message = line.replace('ERROR:', '')
+                
+                # Extract GitHub URL for actions link
+                github_url = ""
+                try:
+                    with open('user_config.json', 'r') as f:
+                        config = json.load(f)
+                        github_url = config.get('git_deployment', {}).get('github_repo_url', '')
+                        github_url = github_url.replace('.git', '') + '/actions'
+                except:
+                    pass
                 
                 self.wfile.write(json.dumps({
                     "progress": progress,
                     "complete": bool(complete_url),
-                    "url": complete_url
+                    "url": complete_url,
+                    "error": error_message,
+                    "github_actions_url": github_url
                 }).encode())
             else:
                 self.wfile.write(json.dumps({
                     "progress": [],
                     "complete": False,
-                    "url": ""
+                    "url": "",
+                    "error": "",
+                    "github_actions_url": ""
                 }).encode())
                 
         elif self.path == '/config':
@@ -179,26 +196,11 @@ class SetupHandler(BaseHTTPRequestHandler):
                         capture_output=True, text=True, check=True
                     )
                     
-                    # Create initial commit if needed
+                    # Stage all files (but don't commit or push yet)
                     subprocess.run(['git', 'add', '.'], check=False)
-                    subprocess.run(
-                        ['git', 'commit', '-m', 'Initial Boot_Lang scaffold setup'],
-                        check=False
-                    )
                     
-                    # Push to GitHub (force push to overwrite any auto-generated README)
-                    result = subprocess.run(
-                        ['git', 'push', '-u', 'origin', 'main', '--force'],
-                        capture_output=True, text=True
-                    )
-                    
-                    if result.returncode != 0:
-                        # Try creating main branch first
-                        subprocess.run(['git', 'branch', '-M', 'main'], check=False)
-                        result = subprocess.run(
-                            ['git', 'push', '-u', 'origin', 'main', '--force'],
-                            capture_output=True, text=True, check=True
-                        )
+                    # Ensure main branch exists
+                    subprocess.run(['git', 'branch', '-M', 'main'], check=False)
                     
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
@@ -213,7 +215,7 @@ class SetupHandler(BaseHTTPRequestHandler):
                     
                     self.wfile.write(json.dumps({
                         "success": True,
-                        "message": "Git initialized and pushed to GitHub"
+                        "message": "Git remote configured - will push when setup completes"
                     }).encode())
                     
                 except subprocess.CalledProcessError as e:

@@ -54,7 +54,7 @@
                     </div>
                     <div id="check-git_initialized" class="flex items-center text-gray-500">
                         <span class="mr-2">⬜</span>
-                        <span>Git Initialized</span>
+                        <span>Git Remote Configured</span>
                     </div>
                     <div id="check-app_service_name" class="flex items-center text-gray-500">
                         <span class="mr-2">⬜</span>
@@ -184,9 +184,9 @@
                         <div id="git-init-section" class="mt-4">
                             <button type="button" id="init-git-btn" disabled
                                     class="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Initialize Git & Push to GitHub
+                                Configure Git Remote
                             </button>
-                            <p class="mt-2 text-sm text-gray-500">This will push initial files to your GitHub repo and create the main branch</p>
+                            <p class="mt-2 text-sm text-gray-500">This will prepare your repo - actual push happens when you complete setup</p>
                             
                             <div id="git-status" class="mt-3 hidden"></div>
                         </div>
@@ -388,7 +388,7 @@
                     initBtn.classList.add('bg-green-700');
                     statusDiv.innerHTML = `
                         <div class="p-3 bg-green-50 border border-green-200 text-green-700 rounded">
-                            ✓ Repository initialized (already completed)
+                            ✓ Git remote already configured
                         </div>
                     `;
                     statusDiv.classList.remove('hidden');
@@ -473,7 +473,7 @@
             // Update Git initialized status
             const gitCheck = document.getElementById('check-git_initialized');
             if (gitInitialized) {
-                gitCheck.innerHTML = `<span class="mr-2 text-green-600">✅</span><span class="text-green-600">Git Initialized</span>`;
+                gitCheck.innerHTML = `<span class="mr-2 text-green-600">✅</span><span class="text-green-600">Git Remote Configured</span>`;
             }
             
             const percentage = Math.round((completed / allFields.length) * 100);
@@ -522,9 +522,9 @@
                     initBtn.classList.add('bg-green-700');
                     statusDiv.innerHTML = `
                         <div class="p-3 bg-green-50 border border-green-200 text-green-700 rounded">
-                            ✓ Repository initialized and pushed to GitHub<br>
-                            ✓ Main branch created<br>
-                            <span class="text-sm">You can now proceed to Azure configuration</span>
+                            ✓ Git remote configured<br>
+                            ✓ Files staged for commit<br>
+                            <span class="text-sm">Will push to GitHub when you complete setup</span>
                         </div>
                     `;
                     statusDiv.classList.remove('hidden');
@@ -535,7 +535,7 @@
                 }
             } catch (error) {
                 initBtn.disabled = false;
-                initBtn.textContent = 'Initialize Git & Push to GitHub';
+                initBtn.textContent = 'Configure Git Remote';
                 statusDiv.innerHTML = `
                     <div class="p-3 bg-red-50 border border-red-200 text-red-700 rounded">
                         Error: ${error.message}
@@ -654,8 +654,8 @@
                             </div>
                             
                             <div id="completion-message" class="hidden">
-                                <div class="bg-green-50 p-4 rounded-md border border-green-200 mb-6">
-                                    <h2 class="text-xl font-bold text-green-800 mb-2">🎉 Setup Complete!</h2>
+                                <div id="completion-card" class="bg-green-50 p-4 rounded-md border border-green-200 mb-6">
+                                    <h2 id="completion-title" class="text-xl font-bold text-green-800 mb-2">🎉 Setup Complete!</h2>
                                     <div id="azure-url" class="mb-4"></div>
                                 </div>
                                 
@@ -701,7 +701,7 @@
                             </div>
                         `).join('');
                         
-                        // Check if complete
+                        // Check if complete or error
                         if (data.complete) {
                             clearInterval(pollingInterval);
                             progressContainer.innerHTML += `
@@ -720,6 +720,33 @@
                                     </a>
                                 `;
                             }
+                            
+                            completionMessage.classList.remove('hidden');
+                        } else if (data.error) {
+                            clearInterval(pollingInterval);
+                            progressContainer.innerHTML += `
+                                <div class="flex items-center p-3 bg-yellow-50 rounded border border-yellow-200">
+                                    <span class="mr-3 text-xl">⚠️</span>
+                                    <span class="text-yellow-800 font-semibold">Setup incomplete - check GitHub Actions</span>
+                                </div>
+                            `;
+                            
+                            // Update card styling and title for error
+                            const card = document.getElementById('completion-card');
+                            const title = document.getElementById('completion-title');
+                            card.className = 'bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-6';
+                            title.className = 'text-xl font-bold text-yellow-800 mb-2';
+                            title.textContent = '⚠️ Setup Incomplete';
+                            
+                            azureUrlDiv.innerHTML = `
+                                <p class="text-sm text-yellow-700 mb-2">⚠️ Deployment verification failed</p>
+                                <p class="text-sm text-gray-600 mb-2">${data.error}</p>
+                                <p class="text-sm text-gray-600 mb-2">Check deployment status at:</p>
+                                <a href="${data.github_actions_url}" target="_blank" 
+                                   class="text-blue-600 hover:underline text-sm">
+                                    ${data.github_actions_url}
+                                </a>
+                            `;
                             
                             completionMessage.classList.remove('hidden');
                         }

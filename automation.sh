@@ -16,6 +16,9 @@ PROJECT_NAME=$(python3 -c "import json; print(json.load(open('user_config.json')
 GITHUB_URL=$(python3 -c "import json; print(json.load(open('user_config.json'))['git_deployment']['github_repo_url'])")
 AZURE_STATIC_URL=$(python3 -c "import json; print(json.load(open('user_config.json'))['azure_settings']['static_web_app_url'])" 2>/dev/null || echo "")
 APP_SERVICE_NAME=$(python3 -c "import json; print(json.load(open('user_config.json'))['azure_settings']['app_service_name'])")
+OPENAI_API_KEY=$(python3 -c "import json; print(json.load(open('user_config.json'))['api_keys']['openai_api_key'])")
+ANTHROPIC_API_KEY=$(python3 -c "import json; print(json.load(open('user_config.json'))['api_keys'].get('anthropic_api_key', ''))" 2>/dev/null || echo "")
+LANGSMITH_API_KEY=$(python3 -c "import json; print(json.load(open('user_config.json'))['api_keys'].get('langsmith_api_key', ''))" 2>/dev/null || echo "")
 
 # Create progress log
 echo "Starting automation..." > setup_progress.log
@@ -159,28 +162,62 @@ echo "DONE:Building welcome page" >> setup_progress.log
 # Step 5: Configure GitHub workflows with user settings
 echo "PROGRESS:Configuring GitHub workflows" >> setup_progress.log
 
-# Update deploy.yml with correct app service name
+# Update deploy.yml with correct app service name (preserve env vars)
 if [ -f ".github/workflows/deploy.yml" ]; then
-    sed -i.bak "s/app-name: .*/app-name: '$APP_SERVICE_NAME'/" .github/workflows/deploy.yml
-    rm -f .github/workflows/deploy.yml.bak
+    # Use python to update YAML safely
+    python3 << EOF
+import re
+with open('.github/workflows/deploy.yml', 'r') as f:
+    content = f.read()
+content = re.sub(r"app-name:.*", f"app-name: '$APP_SERVICE_NAME'", content)
+with open('.github/workflows/deploy.yml', 'w') as f:
+    f.write(content)
+EOF
 fi
 
 echo "DONE:Configuring GitHub workflows" >> setup_progress.log
 
-# Step 6: Push to GitHub
+# Step 6: Add user_config.json to .gitignore (prevent exposing API keys)
+echo "PROGRESS:Securing configuration file" >> setup_progress.log
+if ! grep -q "user_config.json" .gitignore 2>/dev/null; then
+    echo "user_config.json" >> .gitignore
+fi
+echo "DONE:Securing configuration file" >> setup_progress.log
+
+# Step 7: Set GitHub secrets for environment variables
+echo "PROGRESS:Setting GitHub secrets" >> setup_progress.log
+if command -v gh &> /dev/null; then
+    if gh auth status > /dev/null 2>&1; then
+        echo "$OPENAI_API_KEY" | gh secret set OPENAI_API_KEY
+        if [ -n "$ANTHROPIC_API_KEY" ]; then
+            echo "$ANTHROPIC_API_KEY" | gh secret set ANTHROPIC_API_KEY
+        fi
+        if [ -n "$LANGSMITH_API_KEY" ]; then
+            echo "$LANGSMITH_API_KEY" | gh secret set LANGSMITH_API_KEY
+        fi
+        echo "✓ GitHub secrets set successfully"
+    else
+        echo "⚠️ GitHub CLI not authenticated - secrets not set"
+    fi
+else
+    echo "⚠️ GitHub CLI not installed - secrets not set"
+fi
+echo "DONE:Setting GitHub secrets" >> setup_progress.log
+
+# Step 9: Commit and Push to GitHub (first push with all configuration)
 echo "PROGRESS:Pushing to GitHub" >> setup_progress.log
 git add . > /dev/null 2>&1
-git commit -m "Setup complete: $PROJECT_NAME" > /dev/null 2>&1 || true
-git push origin main > /dev/null 2>&1 || true
+git commit -m "Initial Boot_Lang setup: $PROJECT_NAME" > /dev/null 2>&1 || true
+git push -u origin main --force > /dev/null 2>&1 || true
 echo "DONE:Pushing to GitHub" >> setup_progress.log
 
-# Step 7: Wait for GitHub Actions deployment (both frontend + backend)
+# Step 10: Wait for GitHub Actions deployment (both frontend + backend)
 echo "PROGRESS:Deploying to Azure via GitHub Actions" >> setup_progress.log
 echo "Waiting for GitHub Actions to start deployment..."
 sleep 15  # Give GitHub Actions time to start
 echo "DONE:Deploying to Azure via GitHub Actions" >> setup_progress.log
 
-# Step 8: Verify deployment by checking URL content
+# Step 11: Verify deployment by checking URL content
 echo "PROGRESS:Verifying deployment" >> setup_progress.log
 DEPLOYMENT_VERIFIED=false
 
@@ -223,7 +260,9 @@ if [ "$DEPLOYMENT_VERIFIED" = false ]; then
     echo "  This may mean GitHub Actions is still building (check: https://github.com/$(echo $GITHUB_URL | sed 's|https://github.com/||' | sed 's|.git||')/actions)"
     echo "  Your site may still deploy successfully - check the URL in a few minutes"
     echo "DONE:Verifying deployment" >> setup_progress.log
-    echo "COMPLETE:$AZURE_STATIC_URL" >> setup_progress.log  # Return URL anyway so user can check
+    echo "ERROR:Deployment not verified - check GitHub Actions at $GITHUB_URL" >> setup_progress.log
+else
+    echo "COMPLETE:$AZURE_STATIC_URL" >> setup_progress.log
 fi
 
 # Kill setup server

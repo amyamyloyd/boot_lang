@@ -9,4 +9,8 @@ PROGRESS:Building welcome page
 DONE:Building welcome page
 PROGRESS:Configuring GitHub workflows
 DONE:Configuring GitHub workflows
+PROGRESS:Securing configuration file
+DONE:Securing configuration file
+PROGRESS:Setting GitHub secrets
+DONE:Setting GitHub secrets
 PROGRESS:Pushing to GitHub
